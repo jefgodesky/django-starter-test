@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16.0-alpine
+    env_file:
+      - .env.dev
+    volumes:
+      - db-data:/var/lib/postgresql/data:delegated
+
+  dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: dev
+    environment:
+      SQL_HOST: db
+      SQL_PORT: 5432
+    env_file:
+      - .env.dev
+    command: tail -f /dev/null
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db
+    volumes:
+      - ../src:/home/ops/src
+
+volumes:
+  db-data:
